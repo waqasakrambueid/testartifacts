@@ -6,7 +6,19 @@ group = 'net.blueid'
 version = '5.0'
 
 def pomFile = file('repo/net/blueid/access/5.0/access-5.0.pom')
-def pomDoc = new XmlSlurper().parse(pomFile)
+
+
+task checkAarFile {
+    doLast {
+        def aarFile = file("$projectDir/repo/net/blueid/access/5.0/access-5.0.aar")
+        if (!aarFile.exists()) {
+            throw new GradleException("AAR file not found at ${aarFile.path}")
+        }else{
+            println("AAR file found at ${aarFile.path}")
+        }
+    }
+}
+
 
 publishing {
     publications {
@@ -16,6 +28,7 @@ publishing {
             artifactId = 'access'
             version = '5.0'
 
+            print("projectpath: " + projectDir)
 
             // Point to the AAR file location
             artifact file("$projectDir/repo/net/blueid/access/5.0/access-5.0.aar")
@@ -36,19 +49,13 @@ publishing {
                         }
                     }
                 }
-
-                // Use the existing POM file
-//            pom.withXml {
-//                def pomFile = file('repo/net/blueid/access/5.0/access-5.0.pom')
-//                def existingPom = new XmlParser().parse(pomFile)
-//                asNode().children().clear() // clear existing nodes
-//                asNode().append(existingPom) // append nodes from existing POM
-//            }
             }
         }
     }
 
 }
+
+publishToMavenLocal.dependsOn checkAarFile
 
 task install(dependsOn: publishToMavenLocal)
 
