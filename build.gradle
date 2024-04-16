@@ -10,8 +10,24 @@ def pomFile = file('repo/net/blueid/access/5.0/access-5.0.pom')
 
 task checkAarFile {
     doLast {
+
+        if (projectDir.isDirectory()) {
+            for (File f : projectDir.listFiles()) {
+                println("File: ${f.name}")
+            }
+
+        }
         def aarFile = file("$projectDir/repo/net/blueid/access/5.0/access-5.0.aar")
         if (!aarFile.exists()) {
+
+            if (projectDir.isDirectory()) {
+                forEach(projectDir.listFiles()) { f ->
+                    println("File: ${f.name}")
+                }
+
+            }
+
+
             throw new GradleException("AAR file not found at ${aarFile.path}")
         }else{
             println("AAR file found at ${aarFile.path}")
