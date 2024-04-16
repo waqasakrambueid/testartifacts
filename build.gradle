@@ -1,0 +1,56 @@
+plugins {
+    id 'maven-publish'
+}
+
+group = 'net.blueid'
+version = '5.0'
+
+def pomFile = file('repo/net/blueid/access/5.0/access-5.0.pom')
+def pomDoc = new XmlSlurper().parse(pomFile)
+
+publishing {
+    publications {
+        mavenAar(MavenPublication) {
+            // Set the group, name, and version as per your AAR and POM
+            groupId = 'net.blueid'
+            artifactId = 'access'
+            version = '5.0'
+
+
+            // Point to the AAR file location
+            artifact file('repo/net/blueid/access/5.0/access-5.0.aar')
+
+            pom.withXml {
+                def existingPom = new XmlSlurper(false, false).parse('repo/net/blueid/access/5.0/access-5.0.pom')
+
+                // Find the 'dependencies' node from the existing POM
+                def dependenciesNode = existingPom.'dependencies'
+                // Check if the dependencies node exists and has children
+                if (dependenciesNode && dependenciesNode.size() > 0) {
+                    def generatedPomDependencies = asNode().appendNode('dependencies')
+                    dependenciesNode.'dependency'.each { dep ->
+                        def dependencyNode = generatedPomDependencies.appendNode('dependency')
+                        dep.children().each { child ->
+                            // Copy nodes, taking care to not include the namespace
+                            dependencyNode.appendNode(child.name(), child.text())
+                        }
+                    }
+                }
+
+                // Use the existing POM file
+//            pom.withXml {
+//                def pomFile = file('repo/net/blueid/access/5.0/access-5.0.pom')
+//                def existingPom = new XmlParser().parse(pomFile)
+//                asNode().children().clear() // clear existing nodes
+//                asNode().append(existingPom) // append nodes from existing POM
+//            }
+            }
+        }
+    }
+
+}
+
+task install(dependsOn: publishToMavenLocal)
+
+
+// If you need to include any other tasks or dependencies, they can be defined here.
