@@ -18,10 +18,10 @@ publishing {
 
 
             // Point to the AAR file location
-            artifact file('repo/net/blueid/access/5.0/access-5.0.aar')
+            artifact file("$projectDir/repo/net/blueid/access/5.0/access-5.0.aar")
 
             pom.withXml {
-                def existingPom = new XmlSlurper(false, false).parse('repo/net/blueid/access/5.0/access-5.0.pom')
+                def existingPom = new XmlSlurper(false, false).parse("$projectDir/repo/net/blueid/access/5.0/access-5.0.pom")
 
                 // Find the 'dependencies' node from the existing POM
                 def dependenciesNode = existingPom.'dependencies'
